@@ -24,7 +24,24 @@ namespace AbstractTrader
             }
             return tradeData;
         }
+        protected void LogMessage(string message, params object[] args)
+        {
+            Console.WriteLine(message, args);
+            // added for Request 408
+            using (StreamWriter logfile = File.AppendText("log.xml"))
+            {
+                logfile.WriteLine("<log>" + message + "</log>", args);
+            }
 
+        }
+        public virtual void ProcessTrades(Stream stream)
+        //public void ProcessTrades(string url)
+        {
+            var lines = ReadTradeData(stream);
+            //var lines = ReadURLTradeData(url);
+            var trades = ParseTrades(lines);
+            StoreTrades(trades);
+        }
         protected override IEnumerable<TradeRecord> ParseTrades(IEnumerable<string> tradeData)
         {
             LogMessage("INFO: ParseTrades version 1");
